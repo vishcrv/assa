@@ -21,99 +21,95 @@ class Dashboard:
 
     def show_status(self, site_index, total_sites, url, speed, status):
         """
-        Render live status panel with professional terminal aesthetic
+        Ultra-compact dynamic status display
         """
-        # create status information with clean formatting
-        status_info = Table.grid(padding=(0, 2))
-        status_info.add_column(style="white", justify="left", min_width=12)
-        status_info.add_column(style="cyan", justify="left")
+        w = self.console.size.width
         
-        # truncates URL if long
-        display_url = url if len(url) <= 80 else url[:77] + "..."
+        # Extract domain from URL for compact display
+        try:
+            if 'http' in url:
+                domain = url.split('/')[2].replace('www.', '')
+            else:
+                domain = url[:15]
+        except:
+            domain = url[:15]
         
-        status_info.add_row("SITE:", f"{site_index}/{total_sites}")
-        status_info.add_row("URL:", display_url)
-        status_info.add_row("SPEED:", speed.upper())
-        status_info.add_row("STATUS:", status.upper())
+        # Ultra-compact single line status
+        max_domain = max(10, w - 35)  # Dynamic domain length
+        short_domain = domain[:max_domain] + "..." if len(domain) > max_domain else domain
         
-        # create controls table
-        controls = Table.grid()
-        controls.add_column(style="dim white")
-        controls.add_row("\nKEY BINDINGS:")
-        controls.add_row("[1] Slow   [2] Medium   [3] Fast")
-        controls.add_row("[p] Pause/Resume   [n] Next   [b] Prev   [q] Quit")
+        # Create compact status line
+        status_line = f"[cyan]{site_index}/{total_sites}[/cyan] │ [white]{short_domain}[/white] │ [yellow]{speed[0].upper()}[/yellow] │ [green]{status[:4]}[/green]"
         
-        # combine status and controls
-        main_content = Table.grid()
-        main_content.add_column()
-        main_content.add_row(status_info)
-        main_content.add_row(controls)
+        # Dynamic controls based on width
+        if w < 50:
+            controls_line = "[dim]1/2/3 p n b q[/dim]"
+        elif w < 70:
+            controls_line = "[dim]1/2/3=Speed p=Pause n=Next b=Prev q=Quit[/dim]"
+        else:
+            controls_line = "[dim][1/2/3] Speed • [p] Pause • [n] Next • [b] Prev • [q] Quit[/dim]"
+        
+        # Minimal content
+        content = f"{status_line}\n{controls_line}"
         
         panel = Panel(
-            main_content,
-            title="[bold white]ASSA[/bold white]",
-            border_style="white",
-            box=box.ROUNDED,
-            expand=True
+            content,
+            title="[bold]assa[/bold]" if w >= 40 else "[bold]AR[/bold]",
+            border_style="cyan",
+            box=box.MINIMAL,
+            expand=True,
+            padding=(0, 1)
         )
 
-        # initialize live only once
+        # Initialize or update live display with minimal overhead
         if self.live is None:
-            self.live = Live(panel, refresh_per_second=4)
+            self.live = Live(panel, refresh_per_second=15, console=self.console, auto_refresh=True)
             self.live.start()
         else:
             self.live.update(panel)
 
     def show_summary(self, records):
         """
-        Display session summary with professional formatting
+        Ultra-compact responsive summary
         """
         if self.live:
-            self.live.stop()  # stop live panel to prevent duplicate frames
+            self.live.stop()
 
-        # clear and show completion message
         self.console.clear()
-        
-        header_text = Text("SESSION COMPLETED", style="bold white")
-        header_panel = Panel(
-            Align.center(header_text),
-            border_style="green",
-            box=box.ROUNDED
-        )
-        self.console.print(header_panel)
-        self.console.print()
+
+        # Header (minimal)
+        header = Panel("[bold]SUMMARY[/bold]", border_style="green", box=box.MINIMAL, padding=(0,1))
+        self.console.print(header)
 
         if not records:
-            self.console.print(Panel(
-                "[dim white]No sites were visited during this session.[/dim white]",
-                border_style="yellow"
-            ))
+            self.console.print(Panel("[dim]No sites visited[/dim]", border_style="yellow", box=box.MINIMAL, padding=(0,1)))
             return
 
-        # create professional table
-        table = Table(
-            title="SESSION SUMMARY",
-            title_style="bold white",
-            border_style="white",
-            box=box.ROUNDED,
-            show_header=True,
-            header_style="bold white"
-        )
-        table.add_column("#", style="cyan", width=4, justify="center")
-        table.add_column("URL", style="white", min_width=40)
-        table.add_column("DURATION", style="green", width=12, justify="center")
-
-        for i, record in enumerate(records, 1):
-            # truncate URL for better display
-            display_url = record['url'] if len(record['url']) <= 60 else record['url'][:57] + "..."
-            table.add_row(str(i), display_url, record['time_spent'])
+        # Width-aware table
+        w = self.console.size.width
+        table = Table(box=box.MINIMAL, border_style="white", expand=True, show_header=True, header_style="bold")
+        
+        if w < 60:
+            table.add_column("#", width=3, justify="center", style="cyan")
+            table.add_column("SITE", style="white")
+            table.add_column("TIME", width=8, justify="center", style="green")
+            for i, r in enumerate(records, 1):
+                url = r['url']
+                domain = (url.split('/')[2] if '//' in url and len(url.split('/'))>2 else url).replace('www.', '')
+                site = domain[:15] + "..." if len(domain) > 15 else domain
+                table.add_row(str(i), site, r['time_spent'])
+        else:
+            table.add_column("#", width=4, justify="center", style="cyan")
+            table.add_column("URL", style="white")
+            table.add_column("DURATION", width=12, justify="center", style="green")
+            max_url = max(30, w - 25)
+            for i, r in enumerate(records, 1):
+                url = r['url']
+                site = url if len(url) <= max_url else url[:max_url-3] + "..."
+                table.add_row(str(i), site, r['time_spent'])
 
         self.console.print(table)
-        self.console.print()
         
-        # final message
-        final_msg = Panel(
-            "[dim white]thank you for using ASSA - automated search scrolling agent[/dim white]",
-            border_style="dim white"
-        )
-        self.console.print(final_msg)
+        # Footer (minimal)
+        footer = Panel("[dim]Done[/dim]", border_style="dim", box=box.MINIMAL, padding=(0,1))
+        self.console.print(footer)

@@ -310,9 +310,9 @@ class BrowserAgent:
         5. update Dashboard
         """
         # show startup message
-        print("\n" + "=" * 60)
-        print("    automated scrolling search agent - initializing")
-        print("=" * 60)
+        print("\n" + "=" * 50)
+        print("             initializing")
+        print("=" * 50)
         print(f"[INFO] Search query: '{query}'")
         print("[INFO] Starting keyboard listener...")
         print("[INFO] Launching browser...\n")
