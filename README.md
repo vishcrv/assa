@@ -1,7 +1,7 @@
-# ASSA - Automated Searching Scrolling Agent
+# assa - automated searching scrolling agent
 
 ## Overview
-An automated browser tool that searches the web and scrolls through websites with real-time keyboard controls. Built with Selenium WebDriver, Rich terminal UI, and multi-engine search fallbacks.
+an automated browser tool that searches the web and scrolls through websites with real-time keyboard controls. Built with Selenium WebDriver, Rich terminal UI, and multi-engine search fallbacks.
 
 ---
 
@@ -9,8 +9,8 @@ An automated browser tool that searches the web and scrolls through websites wit
 
 ### 1. Clone the Repository
 ```sh
-git clone 
-cd asa
+git clone https://github.com/vishcrv/assa.git
+cd assa
 ```
 
 ### 2. Create and Activate Python Environment
@@ -56,30 +56,22 @@ python main.py "search term"
 python main.py --fast "test"
 ```
 
-### Interactive Mode
-```sh
-python main.py
-# Enter search term when prompted
-```
-
 ---
 
 ## Terminal Screenshots
 
 ### Application Startup
-```
-[PLACEHOLDER: Screenshot of application starting up with initialization messages]
-```
+<img width="1360" height="715" alt="image" src="https://github.com/user-attachments/assets/b5940738-c2d4-4434-b3dc-4b8d761bf88d" />
+
+
 
 ### Main Interface
-```
-[PLACEHOLDER: Screenshot of the Rich terminal UI showing website status and controls]
-```
+<img width="1365" height="720" alt="image" src="https://github.com/user-attachments/assets/b32b8015-26e3-4f13-af0b-7e7677ff10b1" />
+
 
 ### Session Summary
-```
-[PLACEHOLDER: Screenshot of the final session summary with visited sites and time spent]
-```
+<img width="1365" height="716" alt="image" src="https://github.com/user-attachments/assets/ffd54c3f-cf9d-40b7-bfb5-3ab4d3df29d9" />
+
 
 ---
 
@@ -115,7 +107,7 @@ rich>=13.7.0        # Terminal UI components
 
 ## Project Structure
 ```
-asa/
+assa/
 ├── main.py              # Entry point
 ├── agent/
 │   ├── __init__.py
